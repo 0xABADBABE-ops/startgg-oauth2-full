@@ -5,7 +5,7 @@
     <img alt="CI" src="https://img.shields.io/github/actions/workflow/status/0xabadbabe-ops/startgg-oauth2-full/ci.yml?branch=main">
   </a>
   <a href="https://www.npmjs.com/package/startgg-oauth2-pkce">
-    <img alt="npm" src="https://img.shields.io/npm/v/startgg-oauth2-pkce">
+    <img alt="npm" src="https://img.shields.io/npm/v/startgg-oauth2-full">
   </a>
   <a href="./LICENSE">
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-green.svg">
