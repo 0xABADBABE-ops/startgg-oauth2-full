@@ -41,5 +41,6 @@
 ## Release Process
 - Bump `package.json` version and update changelog/notes as needed.
 - Commit and tag in `vX.Y.Z` form, then push the tag (`git push origin vX.Y.Z`).
-- Create a GitHub release using that tag; the `Release Publish` workflow runs automatically.
-- Ensure the repository secret `NPM_TOKEN` is set with publish rights before triggering a release.
+- Create a GitHub release using that tag; the `Release Publish` workflow runs automatically (or run it manually via **Run workflow**).
+- Ensure `NPM_TOKEN` is configured as a repository secret with publish rights to npm.
+- The workflow also publishes to GitHub Packages using `GITHUB_TOKEN`; consumers can install via `npm install @${repo_owner}/startgg-oauth2-full`.

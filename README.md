@@ -55,6 +55,15 @@ npm i startgg-oauth2-full
 # or copy src/auth/StartGGOAuth2.ts into your project
 ```
 
+### GitHub Packages (optional)
+
+This library is also mirrored to GitHub Packages if your environment prefers that registry:
+
+```bash
+npm set //npm.pkg.github.com/:_authToken=<GH_TOKEN_WITH_PACKAGES_SCOPE>
+npm install @0xabadbabe-ops/startgg-oauth2-full
+```
+
 ---
 
 ## Requirements

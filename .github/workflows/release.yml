@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,3 +47,14 @@ jobs:
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish to GitHub Packages
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
+        run: |
+          ORIGINAL_NAME=$(node -p "require('./package.json').name")
+          OWNER_SCOPE=$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')
+          SCOPED_NAME="@${OWNER_SCOPE}/startgg-oauth2-full"
+          npm pkg set name="$SCOPED_NAME"
+          npm publish --registry https://npm.pkg.github.com
+          npm pkg set name="$ORIGINAL_NAME"
