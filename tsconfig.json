@@ -18,8 +18,10 @@
   },
   "include": [
     "src",
-    "examples",
     "__tests__",
     "jest.setup.ts"
+  ],
+  "exclude": [
+    "examples"
   ]
 }
