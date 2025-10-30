@@ -37,3 +37,9 @@
 - Add focused Jest coverage for new logic and ensure `npm test` is green.
 - Update docs (`README.md`, `AGENTS.md`) when behaviour or workflows shift.
 - Capture manual verification steps (demo URLs, curl output) in the PR description.
+
+## Release Process
+- Bump `package.json` version and update changelog/notes as needed.
+- Commit and tag in `vX.Y.Z` form, then push the tag (`git push origin vX.Y.Z`).
+- Create a GitHub release using that tag; the `Release Publish` workflow runs automatically.
+- Ensure the repository secret `NPM_TOKEN` is set with publish rights before triggering a release.
