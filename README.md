@@ -4,7 +4,7 @@
   <a href="https://github.com/0xabadbabe-ops/startgg-oauth2-full/actions/workflows/ci.yml">
     <img alt="CI" src="https://img.shields.io/github/actions/workflow/status/0xabadbabe-ops/startgg-oauth2-full/ci.yml?branch=main">
   </a>
-  <a href="https://www.npmjs.com/package/startgg-oauth2-pkce">
+  <a href="https://www.npmjs.com/package/startgg-oauth2-full">
     <img alt="npm" src="https://img.shields.io/npm/v/startgg-oauth2-full">
   </a>
   <a href="./LICENSE">
