@@ -36,7 +36,10 @@ Cooked for *you* by 0xabadbabe - using a lot of 💜 and few lines of code.
 ... with hope tha this would help for any dev struggling with oauth2 start.gg specific.
 
 ```fish
-startgg-oauth2-full@0.1.0 test
+┬─[playerone@fedora:~/d/startgg-oauth2-full]─[21:08:50]─[G:main =]
+╰─>$ npm test -- pkce
+
+> startgg-oauth2-full@0.2.0 test
 > jest --runInBand pkce
 
  PASS  __tests__/pkce.test.ts
@@ -47,8 +50,11 @@ startgg-oauth2-full@0.1.0 test
 Test Suites: 1 passed, 1 total
 Tests:       2 passed, 2 total
 Snapshots:   0 total
-Time:        1.121 s, estimated 2 s
+Time:        0.641 s, estimated 1 s
 Ran all test suites matching /pkce/i.
+┬─[playerone@fedora:~/d/startgg-oauth2-full]─[21:10:09]─[G:main =]
+╰─>$ 
+[0] 0:fish*                                                                  "~/d/startgg-oauth2-fu" 21:10 30-lis-25
 ```
 
 ## Installation
