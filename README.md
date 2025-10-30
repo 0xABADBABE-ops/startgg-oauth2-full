@@ -69,7 +69,7 @@ npm i startgg-oauth2-pkce
 ### Browser (PKCE → Exchange)
 
 ```ts
-import { buildAuthorizeUrl, StartGGScope } from './src/auth/StartGGOAuth2';
+import { buildAuthorizeUrl, StartGGScope } from 'startgg-oauth2-pkce';
 
 const cfg = {
   clientId: '<client-id>',
@@ -90,7 +90,7 @@ location.href = url;
 ### Callback (Exchange + Bearer)
 
 ```ts
-import { createStartGGAuth2Handler, BearerToken, StartGGScope } from './src/auth/StartGGOAuth2';
+import { createStartGGAuth2Handler, BearerToken, StartGGScope } from 'startgg-oauth2-pkce';
 
 const params = new URLSearchParams(location.search);
 const code = params.get('code')!;
@@ -118,12 +118,17 @@ fetch('https://api.start.gg/your-endpoint', { headers: bearer.toAuthHeader() });
 ## Scripts
 
 ```bash
-npm run dev:browser   # serve examples/browser at http://localhost:5174
-npm run dev:node      # Node example (Node 18+)
-npm run dev:node:server # Local redirect catcher
-npm run build         # tsc build
-npm test              # Jest tests
+npm run build      # tsc build
+npm test           # Jest tests (needs ts-node installed)
 ```
+
+Examples ship as their own workspaces—hop into each folder, install once, then use the local scripts:
+
+- Browser (Vite): `cd examples/browser && npm install && npm run dev`
+- Node CLI/server: `cd examples/node && npm install && npm run dev`
+- Discord.js bot: `cd examples/discordjs && npm install && npm run dev`
+- Next.js app: `cd examples/nextjs && npm install && npm run dev`
+- Frontend Vite demo: `cd examples/vite && npm install && npm run dev`
 
 ---
 
@@ -173,9 +178,11 @@ class OAuth2Error extends Error {
 
 ## Examples
 
-- Browser: `examples/browser/index.html`
-- Node: `examples/node/index.ts`
-- Node redirect catcher: `examples/node/server.ts`
+- Browser (Vite SPA): `examples/browser/`
+- Node CLI + redirect catcher: `examples/node/`
+- Discord bot (discord.js v14): `examples/discordjs/`
+- Next.js (App Router): `examples/nextjs/`
+- Frontend Vite scaffold: `examples/vite/`
 
 ---
 
@@ -190,6 +197,7 @@ GitHub Actions runs TypeScript build + Jest on push/PR (Node 18 & 20). See `.git
 ```text
 startgg-oauth2-full/
 ├── README.md
+├── AGENTS.md
 ├── LICENSE
 ├── package.json
 ├── tsconfig.json
@@ -206,11 +214,11 @@ startgg-oauth2-full/
 │   ├── handler.test.ts
 │   └── pkce.test.ts
 ├── examples/
-│   ├── browser/
-│   │   └── index.html
-│   └── node/
-│       ├── index.ts
-│       └── server.ts
+│   ├── browser/      # Vanilla browser Vite demo
+│   ├── node/         # CLI + local redirect server
+│   ├── discordjs/    # Discord bot OAuth flow
+│   ├── nextjs/       # Next.js App Router example
+│   └── vite/         # Minimal Vite SPA scaffold
 └── .github/
     ├── ISSUE_TEMPLATE/
     │   ├── bug_report.md
