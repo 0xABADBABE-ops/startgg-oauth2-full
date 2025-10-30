@@ -51,7 +51,7 @@ Ran all test suites matching /pkce/i.
 ## Installation
 
 ```bash
-npm i startgg-oauth2-pkce
+npm i startgg-oauth2-full
 # or copy src/auth/StartGGOAuth2.ts into your project
 ```
 
@@ -69,7 +69,7 @@ npm i startgg-oauth2-pkce
 ### Browser (PKCE → Exchange)
 
 ```ts
-import { buildAuthorizeUrl, StartGGScope } from 'startgg-oauth2-pkce';
+import { buildAuthorizeUrl, StartGGScope } from 'startgg-oauth2-full';
 
 const cfg = {
   clientId: '<client-id>',
@@ -90,7 +90,7 @@ location.href = url;
 ### Callback (Exchange + Bearer)
 
 ```ts
-import { createStartGGAuth2Handler, BearerToken, StartGGScope } from 'startgg-oauth2-pkce';
+import { createStartGGAuth2Handler, BearerToken, StartGGScope } from 'startgg-oauth2-full';
 
 const params = new URLSearchParams(location.search);
 const code = params.get('code')!;
