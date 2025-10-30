@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Start.gg OAuth2 Browser Demo</title>
+  </head>
+  <body>
+    <main>
+      <h1>Start.gg OAuth2 (Vanilla Browser)</h1>
+      <p>
+        This demo uses the <code>startgg-oauth2-full</code> helpers to produce a PKCE authorize URL and exchange the
+        resulting authorization code inside a plain browser app.
+      </p>
+
+      <form id="config">
+        <label>
+          Client ID
+          <input name="clientId" value="YOUR_CLIENT_ID" required />
+        </label>
+        <label>
+          Auth Endpoint
+          <input name="authEndpoint" value="https://api.start.gg/oauth/authorize" required />
+        </label>
+        <label>
+          Token Endpoint
+          <input name="tokenEndpoint" value="https://api.start.gg/oauth/token" required />
+        </label>
+        <label>
+          Redirect URI
+          <input name="redirectUri" value="http://localhost:5173/" required />
+        </label>
+        <button type="submit">Generate Authorize URL</button>
+      </form>
+
+      <section>
+        <h2>Generated Values</h2>
+        <h3>Authorize URL</h3>
+        <pre id="output-url">Fill the form to generate a URL.</pre>
+        <h3>Verifier</h3>
+        <pre id="output-verifier">Verifier will be shown here.</pre>
+        <h3>Challenge</h3>
+        <pre id="output-challenge">Challenge will be shown here.</pre>
+      </section>
+
+      <section>
+        <h2>Authorization Callback</h2>
+        <p id="callback-status">Waiting for callback…</p>
+        <pre id="token-preview">Token preview appears here after callback.</pre>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

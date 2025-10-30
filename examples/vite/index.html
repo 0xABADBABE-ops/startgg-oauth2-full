@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Start.gg OAuth2 Vite Demo</title>
+  </head>
+  <body>
+    <main id="app">
+      <h1>Start.gg OAuth2 Vite Demo</h1>
+      <form id="auth-form">
+        <label>
+          Client ID
+          <input name="clientId" value="CHANGE_ME" required />
+        </label>
+        <label>
+          Auth Endpoint
+          <input
+            name="authEndpoint"
+            value="https://start.gg/oauth/authorize"
+            required
+          />
+        </label>
+        <label>
+          Redirect URI
+          <input name="redirectUri" value="http://localhost:5174/callback" required />
+        </label>
+        <button type="submit">Generate Authorize URL</button>
+      </form>
+      <section id="output">
+        <h2>Authorize URL</h2>
+        <pre id="authorize-url">Fill the form and submit.</pre>
+        <h2>Code Verifier</h2>
+        <pre id="code-verifier">Generated verifier will appear here.</pre>
+        <h2>Code Challenge</h2>
+        <pre id="code-challenge">Generated challenge will appear here.</pre>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

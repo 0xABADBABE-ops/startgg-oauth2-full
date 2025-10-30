@@ -1,0 +1,17 @@
+{
+  "name": "startgg-oauth2-node-example",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "oauth-server": "tsx src/server.ts"
+  },
+  "dependencies": {
+    "startgg-oauth2-full": "file:../.."
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.3"
+  }
+}
