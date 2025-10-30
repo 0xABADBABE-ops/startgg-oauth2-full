@@ -7,6 +7,9 @@
   <a href="https://www.npmjs.com/package/startgg-oauth2-full">
     <img alt="npm" src="https://img.shields.io/npm/v/startgg-oauth2-full">
   </a>
+  <a href="https://github.com/0xabadbabe-ops/startgg-oauth2-full/pkgs/npm/startgg-oauth2-full">
+    <img alt="GitHub Packages" src="https://img.shields.io/github/package-json/v/0xabadbabe-ops/startgg-oauth2-full?label=github%20pkg">
+  </a>
   <a href="./LICENSE">
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-green.svg">
   </a>
