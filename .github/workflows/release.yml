@@ -44,11 +44,29 @@ jobs:
         run: npm test -- --ci
 
       - name: Publish
-        run: npm publish --access public
+        id: publish_npm
+        shell: bash
+        run: |
+          set -o pipefail
+          publish_log=$(mktemp)
+
+          if npm publish --access public 2>&1 | tee "$publish_log"; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if grep -q "You cannot publish over the previously published versions" "$publish_log"; then
+            echo "published=false" >> "$GITHUB_OUTPUT"
+            echo "Version already exists on npm; continuing to GitHub Packages publish."
+            exit 0
+          fi
+
+          exit 1
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish to GitHub Packages
+        if: steps.publish_npm.outcome == 'success'
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
         run: |
