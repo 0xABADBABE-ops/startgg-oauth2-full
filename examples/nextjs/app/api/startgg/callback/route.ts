@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { BearerToken } from 'startgg-oauth2-full/src/auth/StartGGOAuth2';
+import { BearerToken } from 'startgg-oauth2-full';
 import { consumePending } from '../../../../lib/pendingStore';
-import { startggHandler } from '../../../../lib/startgg';
+import { getStartggHandler } from '../../../../lib/startgg';
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -34,6 +34,7 @@ export async function GET(request: Request) {
   }
 
   try {
+    const startggHandler = getStartggHandler();
     const tokenResponse = await startggHandler.exchangeToken(code, pending.codeVerifier, pending.scopes);
     const bearer = BearerToken.fromOAuthResponse(tokenResponse);
 

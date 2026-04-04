@@ -3,6 +3,8 @@
     "target": "ES2022",
     "module": "ES2022",
     "moduleResolution": "Bundler",
+    "rootDir": "src",
+    "declaration": true,
     "lib": [
       "ES2022",
       "DOM"
@@ -17,11 +19,6 @@
     ]
   },
   "include": [
-    "src",
-    "__tests__",
-    "jest.setup.ts"
-  ],
-  "exclude": [
-    "examples"
+    "src"
   ]
 }

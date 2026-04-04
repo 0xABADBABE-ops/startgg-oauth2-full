@@ -1,13 +1,14 @@
 import { randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
-import { StartGGScope, buildAuthorizeUrl } from 'startgg-oauth2-full/src/auth/StartGGOAuth2';
-import { startggConfig } from '../../../../lib/startgg';
+import { StartGGScope, buildAuthorizeUrl } from 'startgg-oauth2-full';
+import { getStartggConfig } from '../../../../lib/startgg';
 import { savePending } from '../../../../lib/pendingStore';
 
 export async function POST() {
   try {
     const state = randomUUID();
     const scopes = [StartGGScope.USER_IDENTITY];
+    const startggConfig = getStartggConfig();
 
     const { url, codeVerifier } = await buildAuthorizeUrl(startggConfig, {
       scopes,

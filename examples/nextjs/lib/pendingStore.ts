@@ -1,4 +1,4 @@
-import type { StartGGScope } from 'startgg-oauth2-full/src/auth/StartGGOAuth2';
+import type { StartGGScope } from 'startgg-oauth2-full';
 
 type PendingEntry = {
   codeVerifier: string;

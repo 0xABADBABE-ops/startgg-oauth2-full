@@ -92,7 +92,7 @@ import { buildAuthorizeUrl, StartGGScope } from 'startgg-oauth2-full';
 const cfg = {
   clientId: '<client-id>',
   authEndpoint: 'https://api.start.gg/oauth/authorize',
-  redirectUri: 'https://your.app/callback',
+  redirectUri: 'https://your.app/api/startgg/callback',
 };
 
 const { url, codeVerifier } = await buildAuthorizeUrl(cfg, {
@@ -117,7 +117,7 @@ if (state !== sessionStorage.getItem('oauth:state')) throw new Error('State mism
 
 const handler = createStartGGAuth2Handler({
   clientId: '<client-id>',
-  redirectUri: 'https://your.app/callback',
+  redirectUri: 'https://your.app/api/startgg/callback',
   authEndpoint: 'https://api.start.gg/oauth/authorize',
   tokenEndpoint: 'https://api.start.gg/oauth/token',
 });
@@ -258,7 +258,7 @@ startgg-oauth2-full/
 ## License
 
 **MIT License**
-Copyright © 2025 0xABADBABE-ops
+Copyright © 2026 0xABADBABE-ops
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

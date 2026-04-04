@@ -2,7 +2,7 @@
 // of OAuth2 Authorization Code Flow with PKCE (RFC 6749, RFC 7636)
 // for Start.gg API (https://start.gg/docs/oauth2).
 // Happy to accept PRs for improvements or fixes!
-// (c) 2025 0xabadbabe (jet'aime), Inc. (MIT License)
+// (c) 2026 0xabadbabe (jet'aime), Inc. (MIT License)
 // Happy coding! <3
 
 export enum StartGGScope {
