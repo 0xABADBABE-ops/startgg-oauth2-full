@@ -73,6 +73,10 @@ jobs:
           ORIGINAL_NAME=$(node -p "require('./package.json').name")
           OWNER_SCOPE=$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')
           SCOPED_NAME="@${OWNER_SCOPE}/startgg-oauth2-full"
+          cat > ~/.npmrc <<EOF
+          @${OWNER_SCOPE}:registry=https://npm.pkg.github.com
+          //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+          EOF
           npm pkg set name="$SCOPED_NAME"
           npm publish --registry https://npm.pkg.github.com
           npm pkg set name="$ORIGINAL_NAME"
