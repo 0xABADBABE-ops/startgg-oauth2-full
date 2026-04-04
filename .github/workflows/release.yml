@@ -65,6 +65,14 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Setup Node for GitHub Packages
+        if: steps.publish_npm.outcome == 'success'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com
+          scope: '@${{ github.repository_owner }}'
+
       - name: Publish to GitHub Packages
         if: steps.publish_npm.outcome == 'success'
         env:
@@ -73,10 +81,6 @@ jobs:
           ORIGINAL_NAME=$(node -p "require('./package.json').name")
           OWNER_SCOPE=$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')
           SCOPED_NAME="@${OWNER_SCOPE}/startgg-oauth2-full"
-          cat > ~/.npmrc <<EOF
-          @${OWNER_SCOPE}:registry=https://npm.pkg.github.com
-          //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
-          EOF
           npm pkg set name="$SCOPED_NAME"
           npm publish --registry https://npm.pkg.github.com
           npm pkg set name="$ORIGINAL_NAME"
