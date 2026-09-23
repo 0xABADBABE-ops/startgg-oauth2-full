@@ -357,6 +357,53 @@ class OAuth2Error extends Error {
 
 ---
 
+## Vercel Connect Integration
+
+Use Start.gg with [Vercel Connect](https://vercel.com/docs/connect) for secure, short-lived tokens without storing credentials in your environment.
+
+### Quick Setup
+
+```bash
+# 1. Create Start.gg OAuth app (redirect: https://connect.vercel.com/callback)
+# 2. Create Custom OAuth connector in Vercel Connect
+vercel connect create https://api.start.gg/oauth/authorize --name startgg
+# 3. Attach to your project
+vercel connect attach oauth/startgg
+```
+
+### Use in Your Code
+
+```bash
+npm install @vercel/connect startgg-vercel-connect
+```
+
+```ts
+import { getConnectorUid, getLoginScopes, createTokenParams } from 'startgg-vercel-connect';
+import { getTokenResponse, UserAuthorizationRequiredError } from '@vercel/connect';
+
+const token = await getTokenResponse(
+  getConnectorUid(),
+  createTokenParams({
+    subject: { type: 'user', id: 'user_123' },
+    scopes: getLoginScopes(true),
+  })
+);
+
+// Use with Start.gg GraphQL API
+const response = await fetch('https://api.start.gg/gql/alpha', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token.token}`,
+  },
+  body: JSON.stringify({ query: '{ viewer { id name } }' }),
+});
+```
+
+See [VERCEL_CONNECT_STARTGG.md](./VERCEL_CONNECT_STARTGG.md) for complete guide and [packages/startgg-vercel-connect](./packages/startgg-vercel-connect) for the helper package.
+
+---
+
 ## Examples
 
 - Browser (Vite SPA): `examples/browser/`

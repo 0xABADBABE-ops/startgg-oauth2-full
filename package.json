@@ -27,6 +27,7 @@
     "dev:vite": "cd examples/vite && npm run dev",
     "dev:nextjs": "cd examples/nextjs && npm run dev",
     "dev:discord": "cd examples/discordjs && npm run dev",
+    "build:vercel-connect": "cd packages/startgg-vercel-connect && npm run build",
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
