@@ -1,3 +1,5 @@
+import { STARTGG_ENDPOINTS, STARTGG_SCOPES } from '../constants';
+
 // Full RFC-compliant implementation 
 // of OAuth2 Authorization Code Flow with PKCE (RFC 6749, RFC 7636)
 // for Start.gg API (https://start.gg/docs/oauth2).
@@ -335,13 +337,13 @@ export class StartGGOAuth2Handler implements IOAuth2HandlerWithPKCE {
     return tokenResponse;
   }
 
-  /** Refresh access token; preserve prior refresh token if server omits rotation. */
+  /** Refresh access token; preserve prior refresh token if server omits rotation.
+   * Per RFC 6749, scope should only be included when requesting a subset of original scopes. */
   async refreshToken(refreshToken: string, originalScopes: StartGGScope[]): Promise<OAuth2TokenResponse> {
     const refreshRequest: OAuth2TokenRequestRefresh = {
       grant_type: 'refresh_token',
       refresh_token: refreshToken,
       client_id: this.config.clientId,
-      scope: originalScopes.length ? originalScopes.join(' ') : undefined,
     };
 
     const res = await fetchWithTimeout(this.config.tokenEndpoint, {
@@ -370,9 +372,13 @@ export class StartGGOAuth2Handler implements IOAuth2HandlerWithPKCE {
 export function createStartGGAuth2Handler(params: {
   clientId: string;
   redirectUri: string;
-  authEndpoint: string;
-  tokenEndpoint: string;
+  authEndpoint?: string;
+  tokenEndpoint?: string;
   fetchTimeoutMs?: number;
 }) {
-  return new StartGGOAuth2Handler(params);
+  return new StartGGOAuth2Handler({
+    ...params,
+    authEndpoint: params.authEndpoint ?? STARTGG_ENDPOINTS.authorize,
+    tokenEndpoint: params.tokenEndpoint ?? STARTGG_ENDPOINTS.token,
+  });
 }

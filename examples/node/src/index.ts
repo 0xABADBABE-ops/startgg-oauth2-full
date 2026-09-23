@@ -7,13 +7,14 @@ import {
   StartGGScope,
   buildAuthorizeUrl,
   createStartGGAuth2Handler,
-} from 'startgg-oauth2-full/src/auth/StartGGOAuth2';
+  STARTGG_ENDPOINTS,
+} from 'startgg-oauth2-full';
 
 async function main() {
   const cfg = {
     clientId: process.env.STARTGG_CLIENT_ID ?? 'YOUR_CLIENT_ID',
-    authEndpoint: process.env.STARTGG_AUTH_URL ?? 'https://api.start.gg/oauth/authorize',
-    tokenEndpoint: process.env.STARTGG_TOKEN_URL ?? 'https://api.start.gg/oauth/token',
+    authEndpoint: process.env.STARTGG_AUTH_ENDPOINT ?? STARTGG_ENDPOINTS.authorize,
+    tokenEndpoint: process.env.STARTGG_TOKEN_ENDPOINT ?? STARTGG_ENDPOINTS.token,
     redirectUri: 'http://localhost:3000/callback',
   };
 

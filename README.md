@@ -81,66 +81,229 @@ npm install @0xabadbabe-ops/startgg-oauth2-full
 - Node: **18+** (built-in WebCrypto + `fetch`)
 
 ---
-
-## Quick Start
-
-### Browser (PKCE → Exchange)
-
-```ts
-import { buildAuthorizeUrl, StartGGScope } from 'startgg-oauth2-full';
-
-const cfg = {
-  clientId: '<client-id>',
-  authEndpoint: 'https://api.start.gg/oauth/authorize',
-  redirectUri: 'https://your.app/api/startgg/callback',
-};
-
-const { url, codeVerifier } = await buildAuthorizeUrl(cfg, {
-  scopes: [StartGGScope.USER_IDENTITY, StartGGScope.USER_EMAIL],
-  state: crypto.randomUUID(),
-});
-
-sessionStorage.setItem('pkce:verifier', codeVerifier);
-sessionStorage.setItem('oauth:state', '<same-state>');
-location.href = url;
-```
-
-### Callback (Exchange + Bearer)
-
-```ts
-import { createStartGGAuth2Handler, BearerToken, StartGGScope } from 'startgg-oauth2-full';
-
-const params = new URLSearchParams(location.search);
-const code = params.get('code')!;
-const state = params.get('state')!;
-if (state !== sessionStorage.getItem('oauth:state')) throw new Error('State mismatch');
-
-const handler = createStartGGAuth2Handler({
-  clientId: '<client-id>',
-  redirectUri: 'https://your.app/api/startgg/callback',
-  authEndpoint: 'https://api.start.gg/oauth/authorize',
-  tokenEndpoint: 'https://api.start.gg/oauth/token',
-});
-
-const res = await handler.exchangeToken(code, sessionStorage.getItem('pkce:verifier')!, [
-  StartGGScope.USER_IDENTITY,
-  StartGGScope.USER_EMAIL,
-]);
-
-const bearer = BearerToken.fromOAuthResponse(res);
-fetch('https://api.start.gg/your-endpoint', { headers: bearer.toAuthHeader() });
-```
+ 
+ ## Quick Start
+ 
+ ### Browser (PKCE → Exchange)
+ 
+ ```ts
+ import { buildAuthorizeUrl, StartGGScope, STARTGG_ENDPOINTS } from 'startgg-oauth2-full';
+ 
+ const cfg = {
+   clientId: '<client-id>',
+   authEndpoint: STARTGG_ENDPOINTS.authorize,
+   redirectUri: 'https://your.app/api/startgg/callback',
+ };
+ 
+ const { url, codeVerifier } = await buildAuthorizeUrl(cfg, {
+   scopes: [StartGGScope.USER_IDENTITY, StartGGScope.USER_EMAIL],
+   state: crypto.randomUUID(),
+ });
+ 
+ sessionStorage.setItem('pkce:verifier', codeVerifier);
+ sessionStorage.setItem('oauth:state', '<same-state>');
+ location.href = url;
+ ```
+ 
+ ### Callback (Exchange + Bearer)
+ 
+ ```ts
+ import { createStartGGAuth2Handler, BearerToken, StartGGScope, STARTGG_ENDPOINTS } from 'startgg-oauth2-full';
+ 
+ const params = new URLSearchParams(location.search);
+ const code = params.get('code')!;
+ const state = params.get('state')!;
+ if (state !== sessionStorage.getItem('oauth:state')) throw new Error('State mismatch');
+ 
+ const handler = createStartGGAuth2Handler({
+   clientId: '<client-id>',
+   redirectUri: 'https://your.app/api/startgg/callback',
+   // authEndpoint and tokenEndpoint default to STARTGG_ENDPOINTS
+ });
+ 
+ const res = await handler.exchangeToken(code, sessionStorage.getItem('pkce:verifier')!, [
+   StartGGScope.USER_IDENTITY,
+   StartGGScope.USER_EMAIL,
+ ]);
+ 
+ const bearer = BearerToken.fromOAuthResponse(res);
+ fetch('https://api.start.gg/your-endpoint', { headers: bearer.toAuthHeader() });
+ ```
+ 
+ ### Using Constants for Start.gg Endpoints & Scopes
+ 
+ ```ts
+ import { STARTGG_ENDPOINTS, STARTGG_SCOPES, STARTGG_GQL_AUTH_HEADER, isValidStartGGScope } from 'startgg-oauth2-full';
+ 
+ // All official Start.gg endpoints
+ console.log(STARTGG_ENDPOINTS.authorize);   // https://api.start.gg/oauth/authorize
+ console.log(STARTGG_ENDPOINTS.token);       // https://api.start.gg/oauth/token
+ console.log(STARTGG_ENDPOINTS.gql);         // https://api.start.gg/gql/alpha
+ 
+ // Valid scopes
+ console.log(STARTGG_SCOPES);                // ['user.identity', 'user.email', 'tournament.manager', 'tournament.reporter']
+ console.log(STARTGG_GQL_AUTH_HEADER);       // 'Bearer'
+ 
+ // Scope validation helper
+ const userInput = 'user.identity';
+ if (isValidStartGGScope(userInput)) {
+   // TypeScript narrows to StartGGScopeValue
+ }
+ ```
 
 ---
-
-## Scripts
-
-```bash
-npm run build      # tsc build
-npm test           # Jest tests (needs ts-node installed)
-```
-
-Examples ship as their own workspaces—hop into each folder, install once, then use the local scripts:
+ 
+ ## Advanced Usage
+ 
+ ### Refresh Token Rotation
+ 
+ ```ts
+ import { createStartGGAuth2Handler, BearerToken, StartGGScope } from 'startgg-oauth2-full';
+ 
+ const handler = createStartGGAuth2Handler({ clientId, redirectUri });
+ 
+ // Initial exchange
+ const res = await handler.exchangeToken(code, codeVerifier, [StartGGScope.USER_IDENTITY]);
+ let bearer = BearerToken.fromOAuthResponse(res);
+ 
+ // Later: refresh when expired (skew-aware)
+ if (bearer.willExpireWithin(60)) { // expires within 60s
+   const newRes = await handler.refreshToken(bearer.refreshToken!, [StartGGScope.USER_IDENTITY]);
+   bearer = BearerToken.fromOAuthResponse(newRes); // preserves refresh_token if server omits
+ }
+ ```
+ 
+ ### Custom PKCE Pair (Pre-generated Verifier/Challenge)
+ 
+ ```ts
+ import { buildAuthorizeUrl, computeCodeChallengeS256, generateCodeVerifier } from 'startgg-oauth2-full';
+ 
+ // Generate once, store securely
+ const codeVerifier = generateCodeVerifier(64);
+ const codeChallenge = await computeCodeChallengeS256(codeVerifier);
+ 
+ // Later: build URL with pre-computed pair
+ const { url } = await buildAuthorizeUrl(cfg, {
+   scopes: [StartGGScope.USER_IDENTITY],
+   state: crypto.randomUUID(),
+   codeVerifier,
+   codeChallenge, // validated against verifier
+ });
+ ```
+ 
+ ### Server-Side (Node/Next.js) with Secure State Store
+ 
+ ```ts
+ // lib/startgg.ts (Next.js example)
+ import { createStartGGAuth2Handler, STARTGG_ENDPOINTS } from 'startgg-oauth2-full';
+ 
+ export function getStartggHandler() {
+   return createStartGGAuth2Handler({
+     clientId: process.env.STARTGG_CLIENT_ID!,
+     redirectUri: process.env.STARTGG_REDIRECT_URI!,
+     // Defaults to STARTGG_ENDPOINTS
+   });
+ }
+ 
+ // app/api/startgg/callback/route.ts
+ import { getStartggHandler } from '@/lib/startgg';
+ import { consumePending } from '@/lib/pendingStore'; // your secure store
+ 
+ export async function GET(req: Request) {
+   const { searchParams } = new URL(req.url);
+   const code = searchParams.get('code')!;
+   const state = searchParams.get('state')!;
+ 
+   const pending = consumePending(state); // delete after use
+   if (!pending) return new Response('Invalid state', { status: 400 });
+ 
+   const res = await getStartggHandler().exchangeToken(code, pending.codeVerifier, pending.scopes);
+   return Response.json({ ok: true, scope: res.scope });
+ }
+ ```
+ 
+ ### GraphQL Calls with Bearer Token
+ 
+ ```ts
+ import { BearerToken, STARTGG_ENDPOINTS, STARTGG_GQL_AUTH_HEADER } from 'startgg-oauth2-full';
+ 
+ const bearer = BearerToken.fromOAuthResponse(tokenResponse);
+ 
+ const query = `
+   query GetUser { user { id, name, email } }
+ `;
+ 
+ const response = await fetch(STARTGG_ENDPOINTS.gql, {
+   method: 'POST',
+   headers: {
+     'Content-Type': 'application/json',
+     [STARTGG_GQL_AUTH_HEADER]: bearer.toAuthHeader().Authorization,
+   },
+   body: JSON.stringify({ query }),
+ });
+ 
+ const { data } = await response.json();
+ ```
+ 
+ ### Error Handling
+ 
+ ```ts
+ import { createStartGGAuth2Handler, OAuth2Error, ScopeValidationError, StartGGScope } from 'startgg-oauth2-full';
+ 
+ const handler = createStartGGAuth2Handler(cfg);
+ 
+ try {
+   const res = await handler.exchangeToken(code, verifier, [StartGGScope.USER_IDENTITY]);
+ } catch (err) {
+   if (err instanceof ScopeValidationError) {
+     console.error('Missing scopes:', err.missing); // ['user.email']
+     console.error('Granted scopes:', err.grantedScopes); // ['user.identity']
+   } else if (err instanceof OAuth2Error) {
+     console.error('OAuth error:', err.code); // TOKEN_EXCHANGE_FAILED, INVALID_PKCE_PAIR, etc.
+     console.error('Details:', err.details); // parsed JSON or { raw: '...' }
+   } else {
+     throw err;
+   }
+ }
+ ```
+ 
+### Cloudflare Workers / Edge Runtime
+ 
+ ```ts
+ // Works in Cloudflare Workers, Vercel Edge, Deno, Bun
+ import { createStartGGAuth2Handler, BearerToken, StartGGScope, STARTGG_ENDPOINTS } from 'startgg-oauth2-full';
+ 
+ export default {
+   async fetch(request: Request, env: Env): Promise<Response> {
+     const handler = createStartGGAuth2Handler({
+       clientId: env.STARTGG_CLIENT_ID,
+       redirectUri: new URL('/callback', request.url).href,
+     });
+ 
+     const url = new URL(request.url);
+     if (url.pathname === '/callback') {
+       const code = url.searchParams.get('code')!;
+       const state = url.searchParams.get('state')!;
+       // validate state from your KV/D1 store...
+       const res = await handler.exchangeToken(code, storedVerifier, [StartGGScope.USER_IDENTITY]);
+       return Response.redirect('/dashboard');
+     }
+ 
+     // ... rest of handler
+   },
+ };
+ ```
+ 
+ ---
+ 
+ ## Scripts
+ 
+ ```bash
+ npm run build      # tsc build
+ npm test           # Jest tests (needs ts-node installed)
+ ```
+ 
+ Examples ship as their own workspaces—hop into each folder, install once, then use the local scripts:
 
 - Browser (Vite): `cd examples/browser && npm install && npm run dev`
 - Node CLI/server: `cd examples/node && npm install && npm run dev`

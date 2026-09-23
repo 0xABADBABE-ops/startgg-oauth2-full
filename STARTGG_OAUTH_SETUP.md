@@ -21,8 +21,8 @@ Common scopes:
 ## 4) Environment variables (Node catcher)
 ```bash
 export STARTGG_CLIENT_ID=your_client_id
-export STARTGG_AUTH_URL=https://api.start.gg/oauth/authorize
-export STARTGG_TOKEN_URL=https://api.start.gg/oauth/token
+export STARTGG_AUTH_ENDPOINT=https://api.start.gg/oauth/authorize
+export STARTGG_TOKEN_ENDPOINT=https://api.start.gg/oauth/token
 npm run dev:node:server
 ```
 

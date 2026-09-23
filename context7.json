@@ -1,4 +1,180 @@
 {
   "url": "https://context7.com/0xabadbabe-ops/startgg-oauth2-full",
-  "public_key": "pk_KztHksntezRlHFO55CDPq"
+  "public_key": "pk_KztHksntezRlHFO55CDPq",
+  "project": {
+    "name": "startgg-oauth2-full",
+    "description": "TypeScript OAuth2 PKCE toolkit for Start.gg API with RFC 6749, 6750, 7636 compliance. Zero-dependency, cross-runtime (Node 18+, browsers). Includes PKCE S256, Bearer token handling, scope validation, and ready-to-use examples for Node, Next.js, Discord.js, Vite, and vanilla browser.",
+    "keywords": [
+      "oauth2",
+      "pkce",
+      "start.gg",
+      "startgg",
+      "authorization-code",
+      "bearer-token",
+      "rfc6749",
+      "rfc7636",
+      "rfc6750",
+      "webcrypto",
+      "typescript",
+      "nodejs",
+      "browser",
+      "discord-bot",
+      "nextjs"
+    ],
+    "license": "MIT",
+    "repository": "https://github.com/0xABADBABE-ops/startgg-oauth2-full",
+    "homepage": "https://github.com/0xABADBABE-ops/startgg-oauth2-full#readme",
+    "bugs": "https://github.com/0xABADBABE-ops/startgg-oauth2-full/issues",
+    "maintainers": [
+      {
+        "name": "0xabadbabe",
+        "email": "jet'aime@example.com",
+        "url": "https://github.com/0xabadbabe"
+      }
+    ],
+    "categories": [
+      "Authentication",
+      "Security",
+      "API Clients",
+      "TypeScript",
+      "Developer Tools"
+    ],
+    "platforms": [
+      "node",
+      "browser",
+      "cloudflare-workers",
+      "deno",
+      "bun"
+    ],
+    "dependencies": {
+      "runtime": [],
+      "dev": [
+        "jest",
+        "ts-jest",
+        "typescript",
+        "tsx",
+        "node-fetch",
+        "serve"
+      ]
+    },
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./auth": {
+        "types": "./dist/auth/StartGGOAuth2.d.ts",
+        "import": "./dist/auth/StartGGOAuth2.js"
+      }
+    },
+    "scripts": {
+      "build": "tsc -p tsconfig.json",
+      "test": "jest --runInBand",
+      "test:watch": "jest --watch",
+      "test:coverage": "jest --coverage",
+      "dev:node": "tsx examples/node/index.ts",
+      "dev:node:server": "tsx examples/node/server.ts",
+      "dev:browser": "serve examples/browser -p 5174",
+      "dev:vite": "cd examples/vite && npm run dev",
+      "dev:nextjs": "cd examples/nextjs && npm run dev",
+      "dev:discord": "cd examples/discordjs && npm run dev",
+      "lint": "tsc --noEmit"
+    },
+    "engines": {
+      "node": ">=18.0.0"
+    },
+    "files": [
+      "dist",
+      "README.md",
+      "LICENSE"
+    ],
+    "typesVersions": {
+      "*": {
+        "*": [
+          "dist/*"
+        ]
+      }
+    },
+    "sideEffects": false,
+    "examples": [
+      {
+        "name": "Node CLI",
+        "path": "examples/node/src/index.ts",
+        "description": "Interactive CLI that opens browser, catches redirect, exchanges code for tokens"
+      },
+      {
+        "name": "Node Redirect Server",
+        "path": "examples/node/src/server.ts",
+        "description": "Local HTTP server that handles OAuth callback automatically"
+      },
+      {
+        "name": "Browser (Vite)",
+        "path": "examples/browser/src/main.ts",
+        "description": "Vanilla browser SPA with PKCE flow and sessionStorage persistence"
+      },
+      {
+        "name": "Vite Minimal",
+        "path": "examples/vite/src/main.ts",
+        "description": "Minimal Vite scaffold showing authorize URL generation"
+      },
+      {
+        "name": "Next.js App Router",
+        "path": "examples/nextjs/lib/startgg.ts",
+        "description": "Next.js server actions with secure callback handling and pending state store"
+      },
+      {
+        "name": "Discord.js Bot",
+        "path": "examples/discordjs/src/bot.ts",
+        "description": "Discord bot with slash command to start OAuth, HTTP callback server, DM results"
+      }
+    ],
+    "features": [
+      "PKCE S256 code challenge (RFC 7636)",
+      "High-entropy code verifier (43-128 chars, RFC 7636 compliant)",
+      "RFC 6749 scope validation (assume unchanged when omitted)",
+      "RFC 6750 BearerToken helper with skew-aware expiry",
+      "Zero runtime dependencies",
+      "Cross-runtime: Node 18+, browsers, Cloudflare Workers, Deno, Bun",
+      "WebCrypto API (subtle, getRandomValues)",
+      "Fetch with timeout (configurable, default 15s)",
+      "Form-urlencoded token requests (RFC 6749)",
+      "Robust error handling (JSON + text fallbacks)",
+      "TypeScript 5.x with strict mode",
+      "Jest + ts-jest test suite"
+    ],
+    "integrations": [
+      {
+        "name": "Next.js",
+        "description": "App Router with server actions and secure callback handling",
+        "examplePath": "examples/nextjs"
+      },
+      {
+        "name": "Discord.js",
+        "description": "Bot with slash command OAuth flow and DM delivery",
+        "examplePath": "examples/discordjs"
+      },
+      {
+        "name": "Vite",
+        "description": "SPA with vanilla browser PKCE flow",
+        "examplePath": "examples/vite"
+      },
+      {
+        "name": "Express/Fastify",
+        "description": "Use StartGGOAuth2Handler in any Node HTTP framework",
+        "examplePath": "examples/node"
+      }
+    ],
+    "startggEndpoints": {
+      "authorize": "https://api.start.gg/oauth/authorize",
+      "token": "https://api.start.gg/oauth/token",
+      "graphql": "https://api.start.gg/gql/alpha",
+      "scopes": [
+        "user.identity",
+        "user.email",
+        "tournament.manager",
+        "tournament.reporter"
+      ],
+      "gqlAuthHeader": "Bearer"
+    }
+  }
 }

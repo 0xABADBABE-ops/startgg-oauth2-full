@@ -12,7 +12,7 @@ cp .env.example .env # optional
 npm install
 ```
 
-Populate `STARTGG_CLIENT_ID` in `.env` or your shell. Override the endpoints with `STARTGG_AUTH_URL` and `STARTGG_TOKEN_URL` if you target a non-production Start.gg environment. `PORT` controls the callback server for `npm run oauth-server` (default `3000`).
+Populate `STARTGG_CLIENT_ID` in `.env` or your shell. Override the endpoints with `STARTGG_AUTH_ENDPOINT` and `STARTGG_TOKEN_ENDPOINT` if you target a non-production Start.gg environment. `PORT` controls the callback server for `npm run oauth-server` (default `3000`).
 
 ## Manual Flow (`npm run dev`)
 1. Run the script to generate an authorize URL.

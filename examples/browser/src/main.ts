@@ -3,7 +3,8 @@ import {
   StartGGScope,
   buildAuthorizeUrl,
   createStartGGAuth2Handler,
-} from 'startgg-oauth2-full/src/auth/StartGGOAuth2';
+  STARTGG_ENDPOINTS,
+} from 'startgg-oauth2-full';
 
 const form = document.querySelector<HTMLFormElement>('#config')!;
 const outputUrl = document.querySelector<HTMLPreElement>('#output-url')!;
@@ -26,8 +27,8 @@ form.addEventListener('submit', async event => {
 
   const cfg = {
     clientId: String(data.get('clientId') ?? ''),
-    authEndpoint: String(data.get('authEndpoint') ?? ''),
-    tokenEndpoint: String(data.get('tokenEndpoint') ?? ''),
+    authEndpoint: String(data.get('authEndpoint') ?? STARTGG_ENDPOINTS.authorize),
+    tokenEndpoint: String(data.get('tokenEndpoint') ?? STARTGG_ENDPOINTS.token),
     redirectUri: String(data.get('redirectUri') ?? ''),
   };
 

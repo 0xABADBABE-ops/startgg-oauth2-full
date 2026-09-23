@@ -7,7 +7,8 @@ import {
   StartGGScope,
   buildAuthorizeUrl,
   createStartGGAuth2Handler,
-} from 'startgg-oauth2-full/src/auth/StartGGOAuth2';
+  STARTGG_ENDPOINTS,
+} from 'startgg-oauth2-full';
 
 type PendingAuth = {
   userId: string;
@@ -31,8 +32,8 @@ const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID;
 
 const startggConfig = {
   clientId: process.env.STARTGG_CLIENT_ID!,
-  authEndpoint: process.env.STARTGG_AUTH_ENDPOINT ?? 'https://api.start.gg/oauth/authorize',
-  tokenEndpoint: process.env.STARTGG_TOKEN_ENDPOINT ?? 'https://api.start.gg/oauth/token',
+  authEndpoint: process.env.STARTGG_AUTH_ENDPOINT ?? STARTGG_ENDPOINTS.authorize,
+  tokenEndpoint: process.env.STARTGG_TOKEN_ENDPOINT ?? STARTGG_ENDPOINTS.token,
   redirectUri: process.env.STARTGG_REDIRECT_URI ?? 'http://localhost:5175/oauth/callback',
 };
 

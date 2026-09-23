@@ -1,4 +1,4 @@
-import { buildAuthorizeUrl, StartGGScope } from 'startgg-oauth2-full/src/auth/StartGGOAuth2';
+import { buildAuthorizeUrl, StartGGScope, STARTGG_ENDPOINTS } from 'startgg-oauth2-full';
 
 const form = document.querySelector<HTMLFormElement>('#auth-form');
 const urlOutput = document.querySelector<HTMLPreElement>('#authorize-url');
@@ -13,7 +13,7 @@ form.addEventListener('submit', async event => {
   event.preventDefault();
   const data = new FormData(form);
   const clientId = String(data.get('clientId') ?? '');
-  const authEndpoint = String(data.get('authEndpoint') ?? '');
+  const authEndpoint = String(data.get('authEndpoint') ?? STARTGG_ENDPOINTS.authorize);
   const redirectUri = String(data.get('redirectUri') ?? '');
 
   try {

@@ -2,6 +2,7 @@ import {
   createStartGGAuth2Handler,
   StartGGScope,
   OAuth2Error,
+  ScopeValidationError,
 } from '../src/auth/StartGGOAuth2';
 
 describe('StartGGOAuth2Handler', () => {
@@ -107,5 +108,82 @@ describe('StartGGOAuth2Handler', () => {
     const handler = createStartGGAuth2Handler(cfg);
     await expect(handler.exchangeToken('code', 'verifier', [StartGGScope.USER_IDENTITY]))
       .rejects.toThrow('Token exchange failed');
+  });
+
+  test('exchangeToken throws ScopeValidationError with details', async () => {
+    const mockBody = {
+      access_token: 'at',
+      token_type: 'Bearer',
+      expires_in: 3600,
+      scope: 'user.identity',
+    };
+    jest.spyOn(global, 'fetch' as any).mockResolvedValueOnce(
+      new Response(JSON.stringify(mockBody), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    );
+
+    const handler = createStartGGAuth2Handler(cfg);
+    await expect(
+      handler.exchangeToken('code', 'verifier', [StartGGScope.USER_IDENTITY, StartGGScope.USER_EMAIL])
+    ).rejects.toThrow(ScopeValidationError);
+  });
+
+  test('exchangeToken with empty scopes array succeeds', async () => {
+    const mockBody = {
+      access_token: 'at',
+      token_type: 'Bearer',
+      expires_in: 3600,
+      scope: 'user.identity',
+    };
+    jest.spyOn(global, 'fetch' as any).mockResolvedValueOnce(
+      new Response(JSON.stringify(mockBody), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    );
+
+    const handler = createStartGGAuth2Handler(cfg);
+    const res = await handler.exchangeToken('code', 'verifier', []);
+    expect(res.access_token).toBe('at');
+  });
+
+  test('refreshToken without scope param when originalScopes empty', async () => {
+    const mockBody = {
+      access_token: 'at2',
+      token_type: 'Bearer',
+      expires_in: 3600,
+    };
+    jest.spyOn(global, 'fetch' as any).mockResolvedValueOnce(
+      new Response(JSON.stringify(mockBody), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    );
+
+    const handler = createStartGGAuth2Handler(cfg);
+    const res = await handler.refreshToken('rt-old', []);
+    expect(res.access_token).toBe('at2');
+  });
+
+  test('handler uses custom fetchTimeoutMs', async () => {
+    const mockBody = { access_token: 'at', token_type: 'Bearer', expires_in: 3600 };
+    const fetchSpy = jest.spyOn(global, 'fetch' as any).mockResolvedValueOnce(
+      new Response(JSON.stringify(mockBody), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    );
+
+    const handler = createStartGGAuth2Handler({ ...cfg, fetchTimeoutMs: 5000 });
+    await handler.exchangeToken('code', 'verifier', [StartGGScope.USER_IDENTITY]);
+
+    // fetch called with signal that aborts after timeout
+    expect(fetchSpy).toHaveBeenCalled();
+    const callArgs = fetchSpy.mock.calls[0][1] as RequestInit & { signal: AbortSignal };
+    expect(callArgs.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  test('factory defaults to STARTGG_ENDPOINTS', async () => {
+    const mockBody = { access_token: 'at', token_type: 'Bearer', expires_in: 3600 };
+    jest.spyOn(global, 'fetch' as any).mockResolvedValueOnce(
+      new Response(JSON.stringify(mockBody), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    );
+
+    // No authEndpoint/tokenEndpoint provided - should use defaults
+    const handler = createStartGGAuth2Handler({ clientId: 'id', redirectUri: 'https://app/cb' });
+    await handler.exchangeToken('code', 'verifier', [StartGGScope.USER_IDENTITY]);
+
+    const callArgs = (jest.spyOn(global, 'fetch' as any).mock.calls[0][0]) as string;
+    expect(callArgs).toBe('https://api.start.gg/oauth/token');
   });
 });
