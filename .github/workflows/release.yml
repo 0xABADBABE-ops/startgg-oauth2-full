@@ -27,7 +27,9 @@ jobs:
 
       # Trusted publishing needs npm >= 11.5.1; Node 22 bundles npm 10.x
       - name: Upgrade npm
-        run: npm install -g npm@11
+        run: |
+          npm install -g npm@11
+          npm --version
 
       - name: Install dependencies
         run: npm ci
@@ -55,6 +57,9 @@ jobs:
         # via the trusted publisher configured for this repo on npmjs.com
         run: |
           set -o pipefail
+          # A token from any earlier step/env would preempt OIDC detection
+          unset NODE_AUTH_TOKEN
+          npm --version
           publish_log=$(mktemp)
 
           if npm publish --access public 2>&1 | tee "$publish_log"; then
