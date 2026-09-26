@@ -5,10 +5,10 @@ import { fileURLToPath, URL } from "node:url";
 import {
 	BearerToken,
 	buildAuthorizeUrl,
-	createStartGGAuth2Handler,
 	StartGGScope,
 } from "startgg-oauth2-full";
 import { ConfigError, loadNodeConfig } from "./config.js";
+import { exchangeTokenWithSecret } from "./exchange.js";
 
 const REQUIRED_SCOPES = [StartGGScope.USER_IDENTITY, StartGGScope.USER_EMAIL];
 
@@ -47,10 +47,14 @@ async function main() {
 		{ scopes: REQUIRED_SCOPES, state, extras: { access_type: "offline" } },
 	);
 
+	// Answer the callback at whatever path the redirect URI (and therefore the
+	// Start.gg app registration) uses, instead of a hardcoded "/callback".
+	const callbackPath = new URL(cfg.redirectUri).pathname;
+
 	const server = http.createServer(async (req, res) => {
 		try {
 			const reqUrl = new URL(req.url || "", `http://localhost:${PORT}`);
-			if (reqUrl.pathname !== "/callback") {
+			if (reqUrl.pathname !== callbackPath) {
 				res.writeHead(200, { "Content-Type": "text/plain" });
 				res.end("OK");
 				return;
@@ -68,13 +72,11 @@ async function main() {
 				return;
 			}
 
-			const handler = createStartGGAuth2Handler(cfg);
-
 			try {
-				const tokenResponse = await handler.exchangeToken(
+				const tokenResponse = await exchangeTokenWithSecret(
+					cfg,
 					code,
 					codeVerifier,
-					REQUIRED_SCOPES,
 				);
 				const bearer = BearerToken.fromOAuthResponse(tokenResponse);
 				const masked = (t?: string) =>
@@ -85,7 +87,10 @@ async function main() {
 				console.log("token_type:", tokenResponse.token_type);
 				console.log("expires_in:", tokenResponse.expires_in);
 				console.log("scope:", tokenResponse.scope ?? "(omitted → unchanged)");
-				console.log("\nAuthorization header:", bearer.toAuthHeader());
+				console.log(
+					"\nAuthorization header shape:",
+					`Bearer ${masked(tokenResponse.access_token)} (masked — never log real tokens)`,
+				);
 
 				res.writeHead(200, { "Content-Type": "text/html" });
 				res.end(`

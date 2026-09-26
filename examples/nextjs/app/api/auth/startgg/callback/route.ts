@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { BearerToken } from "startgg-oauth2-full";
-import { consumePending } from "../../../../lib/pendingStore";
-import { getStartggHandler } from "../../../../lib/startgg";
+import { consumePending } from "../../../../../lib/pendingStore";
+import { exchangeTokenWithSecret, getStartggConfig } from "../../../../../lib/startgg";
 
 export async function GET(request: Request) {
 	const url = new URL(request.url);
@@ -40,21 +39,28 @@ export async function GET(request: Request) {
 	}
 
 	try {
-		const startggHandler = getStartggHandler();
-		const tokenResponse = await startggHandler.exchangeToken(
+		const tokenResponse = await exchangeTokenWithSecret(
+			getStartggConfig(),
 			code,
 			pending.codeVerifier,
-			pending.scopes,
 		);
-		const bearer = BearerToken.fromOAuthResponse(tokenResponse);
+		const masked = (t?: string) =>
+			t ? `${t.slice(0, 6)}…${t.slice(-4)}` : null;
 
-		console.log("[nextjs example] Token response", tokenResponse);
+		// Never log full tokens — previews only.
+		console.log("[nextjs example] Token exchange OK", {
+			access_token: masked(tokenResponse.access_token),
+			refresh_token: masked(tokenResponse.refresh_token),
+			token_type: tokenResponse.token_type,
+			expires_in: tokenResponse.expires_in,
+			scope: tokenResponse.scope ?? "(omitted → unchanged)",
+		});
 
 		return NextResponse.json({
 			message: "Authorization complete!",
 			scope: tokenResponse.scope ?? null,
 			expiresIn: tokenResponse.expires_in ?? null,
-			accessTokenPreview: `${bearer.accessToken.slice(0, 8)}…`,
+			accessTokenPreview: masked(tokenResponse.access_token),
 		});
 	} catch (err) {
 		console.error("[nextjs example] Token exchange failed", err);

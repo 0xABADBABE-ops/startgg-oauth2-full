@@ -9,10 +9,10 @@ import {
 	SlashCommandBuilder,
 } from "discord.js";
 import express from "express";
+import type { OAuth2TokenResponse } from "startgg-oauth2-full/auth";
 import {
 	BearerToken,
 	buildAuthorizeUrl,
-	createStartGGAuth2Handler,
 	STARTGG_ENDPOINTS,
 	StartGGScope,
 } from "startgg-oauth2-full";
@@ -63,12 +63,57 @@ if (redirectUrl.protocol !== "http:") {
 const callbackPath = redirectUrl.pathname || "/";
 const callbackPort = Number(redirectUrl.port || 5175);
 
-const startggHandler = createStartGGAuth2Handler({
-	clientId: startggConfig.clientId,
-	redirectUri: startggConfig.redirectUri,
-	authEndpoint: startggConfig.authEndpoint,
-	tokenEndpoint: startggConfig.tokenEndpoint,
-});
+const STARTGG_CLIENT_SECRET = process.env.STARTGG_CLIENT_SECRET?.trim() ?? "";
+if (!STARTGG_CLIENT_SECRET) {
+	console.warn(
+		"[discordjs example] STARTGG_CLIENT_SECRET is not set. start.gg's token endpoint requires it even with PKCE, so the exchange will fail with \"Invalid client\".",
+	);
+}
+
+/**
+ * start.gg's token endpoint requires client_secret even for PKCE flows.
+ * The library stays spec-pure PKCE, so this example-level helper performs
+ * the standard authorization_code POST with the secret added.
+ */
+async function exchangeTokenWithSecret(
+	code: string,
+	codeVerifier: string,
+): Promise<OAuth2TokenResponse> {
+	const body = new URLSearchParams({
+		grant_type: "authorization_code",
+		code,
+		redirect_uri: startggConfig.redirectUri,
+		code_verifier: codeVerifier,
+		client_id: startggConfig.clientId,
+		...(STARTGG_CLIENT_SECRET
+			? { client_secret: STARTGG_CLIENT_SECRET }
+			: {}),
+	});
+
+	const res = await fetch(startggConfig.tokenEndpoint, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/x-www-form-urlencoded",
+			Accept: "application/json",
+		},
+		body,
+	});
+
+	if (!res.ok) {
+		throw new Error(
+			`Token exchange failed: HTTP ${res.status} ${await res.text()}`,
+		);
+	}
+
+	const tokenResponse = (await res.json()) as OAuth2TokenResponse;
+	if (
+		!tokenResponse.access_token ||
+		tokenResponse.token_type?.toLowerCase() !== "bearer"
+	) {
+		throw new Error("Token endpoint returned an unexpected payload");
+	}
+	return tokenResponse;
+}
 
 const client = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.DirectMessages],
@@ -112,6 +157,12 @@ async function registerSlashCommand(): Promise<void> {
 }
 
 client.on("interactionCreate", async (interaction) => {
+	console.log(
+		"[discordjs example] interaction received:",
+		interaction.isChatInputCommand()
+			? `/${interaction.commandName} (guild ${interaction.guildId ?? "DM"})`
+			: `type ${interaction.type}`,
+	);
 	if (
 		!interaction.isChatInputCommand() ||
 		interaction.commandName !== "startgg-auth"
@@ -202,16 +253,23 @@ app.get(callbackPath, async (req, res) => {
 	pendingAuthorizations.delete(state);
 
 	try {
-		const tokenResponse = await startggHandler.exchangeToken(
+		const tokenResponse = await exchangeTokenWithSecret(
 			code,
 			pending.codeVerifier,
-			pending.scopes,
 		);
 		const bearer = BearerToken.fromOAuthResponse(tokenResponse);
+		const masked = (t?: string) =>
+			t ? `${t.slice(0, 6)}…${t.slice(-4)}` : null;
+		// Never log full tokens — previews only.
 		console.log(
 			"[discordjs example] OAuth success for user",
 			pending.userId,
-			tokenResponse,
+			{
+				access_token: masked(tokenResponse.access_token),
+				refresh_token: masked(tokenResponse.refresh_token),
+				token_type: tokenResponse.token_type,
+				expires_in: tokenResponse.expires_in,
+			},
 		);
 
 		try {
@@ -224,7 +282,7 @@ app.get(callbackPath, async (req, res) => {
 					"✅ Start.gg authorization complete!",
 					`Access token (truncated): ${bearer.accessToken.slice(0, 8)}…`,
 					`Expires at: ${expires}`,
-					"Check the bot logs for the full token payload and handle it securely.",
+					"Tokens are only ever logged masked — handle real tokens securely.",
 				].join("\n"),
 			);
 		} catch (dmError) {

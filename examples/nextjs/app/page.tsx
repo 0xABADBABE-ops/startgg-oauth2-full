@@ -14,7 +14,7 @@ export default function HomePage() {
 	const clientId = process.env.NEXT_PUBLIC_STARTGG_CLIENT_ID ?? "unset";
 	const redirectUri =
 		process.env.NEXT_PUBLIC_STARTGG_REDIRECT_URI ??
-		"http://localhost:3000/api/startgg/callback";
+		"http://localhost:3000/api/auth/startgg/callback";
 
 	async function handleAuthorize() {
 		setLoading(true);
@@ -88,10 +88,10 @@ export default function HomePage() {
 			<section>
 				<h2>Callback Output</h2>
 				<p>
-					The callback endpoint responds with a JSON summary. Keep an eye on the
-					terminal running <code>npm run dev</code> to see the raw token
-					payload. Do not ship the in-memory verifier store or plaintext token
-					output to production.
+				The callback endpoint responds with a JSON summary. Keep an eye on the
+				terminal running <code>npm run dev</code> to see the masked token
+				preview — full tokens are never logged. Do not ship the in-memory
+				verifier store to production.
 				</p>
 			</section>
 		</main>

@@ -5,10 +5,10 @@ import { fileURLToPath } from "node:url";
 import {
 	BearerToken,
 	buildAuthorizeUrl,
-	createStartGGAuth2Handler,
 	StartGGScope,
 } from "startgg-oauth2-full";
 import { ConfigError, loadNodeConfig } from "./config.js";
+import { exchangeTokenWithSecret } from "./exchange.js";
 
 async function main() {
 	const cfg = loadNodeConfig();
@@ -37,10 +37,7 @@ async function main() {
 		process.exit(1);
 	}
 
-	const handler = createStartGGAuth2Handler(cfg);
-	const tokenResponse = await handler.exchangeToken(code, codeVerifier, [
-		StartGGScope.USER_IDENTITY,
-	]);
+	const tokenResponse = await exchangeTokenWithSecret(cfg, code, codeVerifier);
 	const bearer = BearerToken.fromOAuthResponse(tokenResponse);
 
 	const masked = (t?: string) =>
@@ -50,7 +47,10 @@ async function main() {
 	console.log("refresh_token:", masked(tokenResponse.refresh_token));
 	console.log("token_type:", tokenResponse.token_type);
 	console.log("expires_in:", tokenResponse.expires_in ?? "n/a");
-	console.log("\nAuthorization header:", bearer.toAuthHeader());
+	console.log(
+		"\nAuthorization header shape:",
+		`Bearer ${masked(tokenResponse.access_token)} (masked — never log real tokens)`,
+	);
 }
 
 const isMainModule = process.argv[1] === fileURLToPath(import.meta.url);

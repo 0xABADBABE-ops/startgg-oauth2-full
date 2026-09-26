@@ -24,6 +24,12 @@ let lastConfig: {
 	redirectUri: string;
 } | null = null;
 
+// Default to the relay on this dev origin: start.gg's token endpoint has no
+// CORS and requires the client secret, so the browser must not call it
+// directly (the vite middleware in vite.config.ts adds the secret).
+const DEFAULT_TOKEN_ENDPOINT = "/startgg/token";
+const DEFAULT_REDIRECT_URI = "http://localhost:3000/api/auth/startgg/callback";
+
 form.addEventListener("submit", async (event) => {
 	event.preventDefault();
 	const data = new FormData(form);
@@ -33,8 +39,11 @@ form.addEventListener("submit", async (event) => {
 		authEndpoint: String(
 			data.get("authEndpoint") ?? STARTGG_ENDPOINTS.authorize,
 		),
-		tokenEndpoint: String(data.get("tokenEndpoint") ?? STARTGG_ENDPOINTS.token),
-		redirectUri: String(data.get("redirectUri") ?? ""),
+		tokenEndpoint: String(
+			data.get("tokenEndpoint") ?? DEFAULT_TOKEN_ENDPOINT,
+		),
+		redirectUri:
+			String(data.get("redirectUri") ?? "") || DEFAULT_REDIRECT_URI,
 	};
 
 	try {
@@ -51,6 +60,12 @@ form.addEventListener("submit", async (event) => {
 		sessionStorage.setItem("startgg:lastConfig", JSON.stringify(cfg));
 
 		outputUrl.textContent = url;
+		// Same-tab link on purpose: the verifier is in this tab's sessionStorage.
+		const link = document.querySelector<HTMLAnchorElement>("#authorize-link");
+		if (link) {
+			link.href = url;
+			link.hidden = false;
+		}
 		outputVerifier.textContent = codeVerifier;
 		outputChallenge.textContent = codeChallenge;
 		callbackStatus.textContent = "Waiting for authorization code…";

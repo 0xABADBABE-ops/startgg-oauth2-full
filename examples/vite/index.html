@@ -22,18 +22,41 @@
           />
         </label>
         <label>
+          Token Endpoint
+          <input name="tokenEndpoint" value="/startgg/token" required />
+        </label>
+        <label>
           Redirect URI
-          <input name="redirectUri" value="http://localhost:5174/callback" required />
+          <input
+            name="redirectUri"
+            value="http://localhost:3000/api/auth/startgg/callback"
+            required
+          />
         </label>
         <button type="submit">Generate Authorize URL</button>
       </form>
       <section id="output">
         <h2>Authorize URL</h2>
         <pre id="authorize-url">Fill the form and submit.</pre>
+        <p>
+          <!-- Same tab on purpose: the PKCE verifier lives in this tab's sessionStorage. -->
+          <a id="authorize-link" href="#" hidden>Open the authorize URL in this tab</a>
+        </p>
         <h2>Code Verifier</h2>
         <pre id="code-verifier">Generated verifier will appear here.</pre>
         <h2>Code Challenge</h2>
         <pre id="code-challenge">Generated challenge will appear here.</pre>
+      </section>
+      <section id="callback">
+        <h2>Authorization Callback</h2>
+        <p id="callback-status">Waiting for callback…</p>
+        <pre id="token-preview">Token preview appears here after callback.</pre>
+        <p>
+          The token exchange goes through the dev-server relay
+          (<code>/startgg/token</code>), which adds the client secret
+          server-side — start.gg's token endpoint has no CORS and requires the
+          secret, so the browser can never call it directly.
+        </p>
       </section>
     </main>
     <script type="module" src="/src/main.ts"></script>

@@ -1,5 +1,9 @@
 import dotenv from "dotenv";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { STARTGG_ENDPOINTS } from "startgg-oauth2-full";
+
+const EXAMPLE_ENV = fileURLToPath(new URL("../.env", import.meta.url));
 
 /**
  * Values that mean "the placeholder was never replaced".
@@ -21,6 +25,7 @@ export class ConfigError extends Error {
 
 export type NodeExampleConfig = {
 	clientId: string;
+	clientSecret?: string;
 	authEndpoint: string;
 	tokenEndpoint: string;
 	redirectUri: string;
@@ -34,7 +39,10 @@ export type NodeExampleConfig = {
  * `PORT` so the value always matches the listener started by `server.ts`.
  */
 export function loadNodeConfig(): NodeExampleConfig {
-	dotenv.config();
+	// Load `.env` next to this example first so the documented root-level
+	// `npm run dev:node` / `npm run dev:node:server` work from any cwd; fall
+	// back to the caller's working directory.
+	dotenv.config({ path: [EXAMPLE_ENV, resolve(process.cwd(), ".env")] });
 
 	const port = Number(process.env.PORT ?? 3000);
 	const redirectUri =
@@ -70,8 +78,24 @@ export function loadNodeConfig(): NodeExampleConfig {
 		);
 	}
 
+	const clientSecret = process.env.STARTGG_CLIENT_SECRET?.trim() ?? "";
+	if (!clientSecret) {
+		console.warn(
+			[
+				"",
+				"⚠️  STARTGG_CLIENT_SECRET is not set. start.gg's token endpoint requires",
+				'    it even with PKCE, so the final code-for-token exchange will fail',
+				'    with "Invalid client".',
+				"",
+			].join("\n"),
+		);
+	}
+
 	return {
 		clientId,
+		// start.gg's token endpoint requires the client secret; the exchange
+		// fails with "Invalid client" without it.
+		clientSecret: clientSecret || undefined,
 		authEndpoint:
 			process.env.STARTGG_AUTH_ENDPOINT ?? STARTGG_ENDPOINTS.authorize,
 		tokenEndpoint:
