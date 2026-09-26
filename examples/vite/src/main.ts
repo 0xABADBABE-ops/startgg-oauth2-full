@@ -1,38 +1,45 @@
-import { buildAuthorizeUrl, StartGGScope, STARTGG_ENDPOINTS } from 'startgg-oauth2-full';
+import {
+	buildAuthorizeUrl,
+	STARTGG_ENDPOINTS,
+	StartGGScope,
+} from "startgg-oauth2-full";
 
-const form = document.querySelector<HTMLFormElement>('#auth-form');
-const urlOutput = document.querySelector<HTMLPreElement>('#authorize-url');
-const verifierOutput = document.querySelector<HTMLPreElement>('#code-verifier');
-const challengeOutput = document.querySelector<HTMLPreElement>('#code-challenge');
+const form = document.querySelector<HTMLFormElement>("#auth-form");
+const urlOutput = document.querySelector<HTMLPreElement>("#authorize-url");
+const verifierOutput = document.querySelector<HTMLPreElement>("#code-verifier");
+const challengeOutput =
+	document.querySelector<HTMLPreElement>("#code-challenge");
 
 if (!form || !urlOutput || !verifierOutput || !challengeOutput) {
-  throw new Error('Demo markup not found');
+	throw new Error("Demo markup not found");
 }
 
-form.addEventListener('submit', async event => {
-  event.preventDefault();
-  const data = new FormData(form);
-  const clientId = String(data.get('clientId') ?? '');
-  const authEndpoint = String(data.get('authEndpoint') ?? STARTGG_ENDPOINTS.authorize);
-  const redirectUri = String(data.get('redirectUri') ?? '');
+form.addEventListener("submit", async (event) => {
+	event.preventDefault();
+	const data = new FormData(form);
+	const clientId = String(data.get("clientId") ?? "");
+	const authEndpoint = String(
+		data.get("authEndpoint") ?? STARTGG_ENDPOINTS.authorize,
+	);
+	const redirectUri = String(data.get("redirectUri") ?? "");
 
-  try {
-    const result = await buildAuthorizeUrl(
-      { clientId, authEndpoint, redirectUri },
-      {
-        scopes: [StartGGScope.USER_IDENTITY, StartGGScope.USER_EMAIL],
-        state: crypto.randomUUID(),
-        extras: { prompt: 'consent' },
-      }
-    );
+	try {
+		const result = await buildAuthorizeUrl(
+			{ clientId, authEndpoint, redirectUri },
+			{
+				scopes: [StartGGScope.USER_IDENTITY, StartGGScope.USER_EMAIL],
+				state: crypto.randomUUID(),
+				extras: { prompt: "consent" },
+			},
+		);
 
-    urlOutput.textContent = result.url;
-    verifierOutput.textContent = result.codeVerifier;
-    challengeOutput.textContent = result.codeChallenge;
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    urlOutput.textContent = `Failed to build URL: ${message}`;
-    verifierOutput.textContent = '—';
-    challengeOutput.textContent = '—';
-  }
+		urlOutput.textContent = result.url;
+		verifierOutput.textContent = result.codeVerifier;
+		challengeOutput.textContent = result.codeChallenge;
+	} catch (err) {
+		const message = err instanceof Error ? err.message : String(err);
+		urlOutput.textContent = `Failed to build URL: ${message}`;
+		verifierOutput.textContent = "—";
+		challengeOutput.textContent = "—";
+	}
 });

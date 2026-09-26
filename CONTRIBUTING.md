@@ -23,7 +23,7 @@ npm run dev:browser
 npm run dev:node
 STARTGG_CLIENT_ID=your_id \
 STARTGG_AUTH_ENDPOINT=https://api.start.gg/oauth/authorize \
-STARTGG_TOKEN_ENDPOINT=https://api.start.gg/oauth/token \
+STARTGG_TOKEN_ENDPOINT=https://api.start.gg/oauth/access_token \
 npm run dev:node:server
 ```
 

@@ -1,5 +1,5 @@
 // Example: Complete Next.js App Router with Vercel Connect + Start.gg
-// 
+//
 // Setup:
 // 1. Create Start.gg OAuth app at https://start.gg/developer
 //    - Redirect URI: https://connect.vercel.com/callback
@@ -13,71 +13,78 @@
 // - Server action to call Start.gg GraphQL API
 
 import {
-  getConnectorUid,
-  getLoginScopes,
-  createTokenParams,
-  STARTGG_VERCEL_CONNECT_CONFIG,
-} from 'startgg-vercel-connect';
+	getTokenResponse,
+	startAuthorization,
+	UserAuthorizationRequiredError,
+} from "@vercel/connect";
+import { cookies } from "next/headers";
 import {
-  getTokenResponse,
-  startAuthorization,
-  UserAuthorizationRequiredError,
-} from '@vercel/connect';
-import { cookies } from 'next/headers';
+	createTokenParams,
+	getConnectorUid,
+	getLoginScopes,
+	STARTGG_VERCEL_CONNECT_CONFIG,
+} from "startgg-vercel-connect";
 
 // ============================================
 // lib/startgg.ts - Server-side helpers
 // ============================================
 
 export async function getStartggAuthorizeUrl(userId: string) {
-  const { url } = await startAuthorization(getConnectorUid(), {
-    subject: { type: 'user', id: userId },
-    scopes: getLoginScopes(true),
-  });
-  return url;
+	const { url } = await startAuthorization(getConnectorUid(), {
+		subject: { type: "user", id: userId },
+		scopes: getLoginScopes(true),
+	});
+	return url;
 }
 
 export async function getStartggToken(userId: string) {
-  const response = await getTokenResponse(getConnectorUid(), {
-    subject: { type: 'user', id: userId },
-    scopes: getLoginScopes(true),
-  });
-  return response.token;
+	const response = await getTokenResponse(getConnectorUid(), {
+		subject: { type: "user", id: userId },
+		scopes: getLoginScopes(true),
+	});
+	return response.token;
 }
 
-export async function callStartggGraphQL(token: string, query: string, variables?: Record<string, unknown>) {
-  const response = await fetch(STARTGG_VERCEL_CONNECT_CONFIG.endpoints.graphql, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
-    body: JSON.stringify({ query, variables }),
-  });
+export async function callStartggGraphQL(
+	token: string,
+	query: string,
+	variables?: Record<string, unknown>,
+) {
+	const response = await fetch(
+		STARTGG_VERCEL_CONNECT_CONFIG.endpoints.graphql,
+		{
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify({ query, variables }),
+		},
+	);
 
-  if (!response.ok) {
-    throw new Error(`GraphQL request failed: ${response.status}`);
-  }
+	if (!response.ok) {
+		throw new Error(`GraphQL request failed: ${response.status}`);
+	}
 
-  return response.json();
+	return response.json();
 }
 
 // ============================================
 // app/actions.ts - Server Actions
 // ============================================
 
-'use server';
+("use server");
 
 export async function startStartggAuth(userId: string) {
-  const url = await getStartggAuthorizeUrl(userId);
-  return { url };
+	const url = await getStartggAuthorizeUrl(userId);
+	return { url };
 }
 
 export async function getUserProfile(userId: string) {
-  try {
-    const token = await getStartggToken(userId);
+	try {
+		const token = await getStartggToken(userId);
 
-    const query = `
+		const query = `
       query GetUser {
         user {
           id
@@ -89,21 +96,21 @@ export async function getUserProfile(userId: string) {
       }
     `;
 
-    const data = await callStartggGraphQL(token, query);
-    return data.data?.user;
-  } catch (error) {
-    if (error instanceof UserAuthorizationRequiredError) {
-      const url = await getStartggAuthorizeUrl(userId);
-      return { error: 'authorization_required', url };
-    }
-    throw error;
-  }
+		const data = await callStartggGraphQL(token, query);
+		return data.data?.user;
+	} catch (error) {
+		if (error instanceof UserAuthorizationRequiredError) {
+			const url = await getStartggAuthorizeUrl(userId);
+			return { error: "authorization_required", url };
+		}
+		throw error;
+	}
 }
 
 export async function createTournament(userId: string, name: string) {
-  const token = await getStartggToken(userId);
+	const token = await getStartggToken(userId);
 
-  const mutation = `
+	const mutation = `
     mutation CreateTournament($name: String!) {
       createTournament(name: $name) {
         id
@@ -112,8 +119,8 @@ export async function createTournament(userId: string, name: string) {
     }
   `;
 
-  const data = await callStartggGraphQL(token, mutation, { name });
-  return data.data?.createTournament;
+	const data = await callStartggGraphQL(token, mutation, { name });
+	return data.data?.createTournament;
 }
 
 // ============================================

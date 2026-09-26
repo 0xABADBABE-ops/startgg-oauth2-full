@@ -22,7 +22,7 @@ Common scopes:
 ```bash
 export STARTGG_CLIENT_ID=your_client_id
 export STARTGG_AUTH_ENDPOINT=https://api.start.gg/oauth/authorize
-export STARTGG_TOKEN_ENDPOINT=https://api.start.gg/oauth/token
+export STARTGG_TOKEN_ENDPOINT=https://api.start.gg/oauth/access_token
 npm run dev:node:server
 ```
 

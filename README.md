@@ -137,7 +137,7 @@ npm install @0xabadbabe-ops/startgg-oauth2-full
  
  // All official Start.gg endpoints
  console.log(STARTGG_ENDPOINTS.authorize);   // https://api.start.gg/oauth/authorize
- console.log(STARTGG_ENDPOINTS.token);       // https://api.start.gg/oauth/token
+ console.log(STARTGG_ENDPOINTS.token);       // https://api.start.gg/oauth/access_token
  console.log(STARTGG_ENDPOINTS.gql);         // https://api.start.gg/gql/alpha
  
  // Valid scopes

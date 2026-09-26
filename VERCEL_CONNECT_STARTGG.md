@@ -36,7 +36,7 @@ This guide shows how to connect **Start.gg** to **Vercel Connect** using a **Cus
 3. Choose **OAuth** → **Custom** (not Managed)
 4. Enter:
    - **Authorization URL**: `https://api.start.gg/oauth/authorize`
-   - **Token URL**: `https://api.start.gg/oauth/token`
+   - **Token URL**: `https://api.start.gg/oauth/access_token`
    - **Client ID**: Your Start.gg Client ID
    - **Client Secret**: Your Start.gg Client Secret
    - **Scopes**: `user.identity user.email tournament.manager tournament.reporter`
@@ -61,7 +61,7 @@ The CLI will prompt for:
 - Client ID: (your Start.gg Client ID)
 - Client Secret: (your Start.gg Client Secret)
 - Scopes: `user.identity user.email tournament.manager tournament.reporter`
-- Token endpoint: `https://api.start.gg/oauth/token`
+- Token endpoint: `https://api.start.gg/oauth/access_token`
 
 ---
 
@@ -192,7 +192,7 @@ First run will show consent URL. Open it in browser, authorize, then re-run.
   "managed": false,
   "config": {
     "authorizationUrl": "https://api.start.gg/oauth/authorize",
-    "tokenUrl": "https://api.start.gg/oauth/token",
+    "tokenUrl": "https://api.start.gg/oauth/access_token",
     "scopes": [
       "user.identity",
       "user.email",

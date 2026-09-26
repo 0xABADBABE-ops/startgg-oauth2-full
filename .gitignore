@@ -14,6 +14,11 @@ coverage/
 
 *.tsbuildinfo
 
+# Environment / secrets — keep the checked-in templates, ignore everything else
+.env
+.env.*
+!.env.example
+
 .DS_Store
 Thumbs.db
 .idea/
@@ -23,3 +28,4 @@ Thumbs.db
 .serena/
 examples/**/.cache/
 examples/**/dist/
+.qwen/settings.json

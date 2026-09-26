@@ -1,41 +1,41 @@
 {
-  "name": "startgg-vercel-connect",
-  "version": "0.1.0",
-  "description": "Vercel Connect configuration and helpers for Start.gg OAuth",
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist",
-    "README.md"
-  ],
-  "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
-    "test": "echo \"No tests yet\" && exit 0"
-  },
-  "keywords": [
-    "vercel",
-    "vercel-connect",
-    "start.gg",
-    "startgg",
-    "oauth",
-    "oauth2",
-    "pkce"
-  ],
-  "author": "0xabadbabe",
-  "license": "MIT",
-  "peerDependencies": {
-    "@vercel/connect": ">=1.0.0"
-  },
-  "devDependencies": {
-    "@vercel/connect": "^1.0.0",
-    "typescript": "^5.6.0"
-  }
+	"name": "startgg-vercel-connect",
+	"version": "0.1.0",
+	"description": "Vercel Connect configuration and helpers for Start.gg OAuth",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch",
+		"test": "echo \"No tests yet\" && exit 0"
+	},
+	"keywords": [
+		"vercel",
+		"vercel-connect",
+		"start.gg",
+		"startgg",
+		"oauth",
+		"oauth2",
+		"pkce"
+	],
+	"author": "0xabadbabe",
+	"license": "MIT",
+	"peerDependencies": {
+		"@vercel/connect": ">=1.0.0"
+	},
+	"devDependencies": {
+		"@vercel/connect": "^1.0.0",
+		"typescript": "^5.6.0"
+	}
 }
