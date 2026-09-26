@@ -22,7 +22,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          registry-url: https://registry.npmjs.org
+          # no registry-url here: it writes an authToken entry to .npmrc,
+          # which npm treats as configured auth and skips OIDC detection.
+          # The GitHub Packages step below sets its own registry-url.
           cache: npm
 
       # Trusted publishing needs npm >= 11.5.1; Node 22 bundles npm 10.x
