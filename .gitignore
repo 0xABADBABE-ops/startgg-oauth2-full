@@ -28,4 +28,9 @@ Thumbs.db
 .serena/
 examples/**/.cache/
 examples/**/dist/
+examples/**/.next/
 .qwen/settings.json
+
+# Local agent/index tooling state
+.codegraph/
+.zcode/
