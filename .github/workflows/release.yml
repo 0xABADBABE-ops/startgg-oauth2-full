@@ -13,6 +13,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write # OIDC: npm trusted publishing mints a short-lived token per run
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,9 +21,13 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           registry-url: https://registry.npmjs.org
           cache: npm
+
+      # Trusted publishing needs npm >= 11.5.1; Node 22 bundles npm 10.x
+      - name: Upgrade npm
+        run: npm install -g npm@11
 
       - name: Install dependencies
         run: npm ci
@@ -46,6 +51,8 @@ jobs:
       - name: Publish
         id: publish_npm
         shell: bash
+        # No token: npm >= 11 detects the OIDC environment and authenticates
+        # via the trusted publisher configured for this repo on npmjs.com
         run: |
           set -o pipefail
           publish_log=$(mktemp)
@@ -62,8 +69,6 @@ jobs:
           fi
 
           exit 1
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Setup Node for GitHub Packages
         if: steps.publish_npm.outcome == 'success'

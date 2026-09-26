@@ -20,6 +20,10 @@
 		"LICENSE"
 	],
 	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/0xABADBABE-ops/startgg-oauth2-full.git"
+	},
 	"scripts": {
 		"dev:browser": "serve examples/browser -p 5174",
 		"dev:node": "tsx examples/node/src/index.ts",
